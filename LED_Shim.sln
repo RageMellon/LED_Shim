@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.6.33801.468
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LED_Shim", "LED_Shim\LED_Shim.csproj", "{66E7C2B7-456A-4BE3-BFE8-0DFBDA067C27}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{66E7C2B7-456A-4BE3-BFE8-0DFBDA067C27}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{66E7C2B7-456A-4BE3-BFE8-0DFBDA067C27}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{66E7C2B7-456A-4BE3-BFE8-0DFBDA067C27}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{66E7C2B7-456A-4BE3-BFE8-0DFBDA067C27}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {D5A3B39C-1F97-458A-9505-4FE36B15FB5F}
+	EndGlobalSection
+EndGlobal
