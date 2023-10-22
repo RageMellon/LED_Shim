@@ -7,7 +7,7 @@ public class LEDShim
 	private bool clearOnExit;
 	private double brightness;
 	private int currentFrame;
-	private int width;
+	private int Width;
 	private List<int[]> buf;
 	private int Addr;
 
@@ -87,36 +87,37 @@ public class LEDShim
 		222, 224, 227, 229, 231, 233, 235, 237, 239, 241, 244, 246, 248, 250, 252, 255
 	};
 
-	public LEDShim(int addr = 0x74, int width = 28)
+	public LEDShim(int addr = 0x75, int width = 28)
 	{
-		this.width = width;
-		this.isSetup = false;
-		this.clearOnExit = true;
-		this.brightness = 1.0;
-		this.buf = new List<int[]>();
-		for (int i = 0; i < width; i++)
+		Addr = addr;
+		Width = width;
+		isSetup = false;
+		clearOnExit = true;
+		brightness = 1.0;
+		buf = new List<int[]>();
+		for (var i = 0; i < width; i++)
 		{
-			this.buf.Add(new int[] { 0, 0, 0, 255 });
+			buf.Add(new [] { 0, 0, 0, 255 });
 		}
-		this.Clear();
-		this.i2c = null;
+		Clear();
 	}
 
 	private void Setup()
 	{
-		if (this.isSetup)
+		if (isSetup)
 		{
 			return;
 		}
-		this.isSetup = true;
-		this.i2c = I2cDevice.Create(new I2cConnectionSettings(1, this.Addr));
-		this.Reset();
-		this.Show();
-		this.Bank(CONFIG_BANK);
-		this.Write(this.Addr, MODE_REGISTER, new byte[] { PICTURE_MODE });
-		this.Write(this.Addr, AUDIOSYNC_REGISTER, new byte[] { 0 });
+		isSetup = true;
+		i2c = I2cDevice.Create(new I2cConnectionSettings(1, Addr));
+		Console.WriteLine($"Device Name: \"{i2c.QueryComponentInformation()?.Name}\"");
+		Reset();
+		Show();
+		Bank(CONFIG_BANK);
+		Write(MODE_REGISTER, new [] { PICTURE_MODE });
+		Write(AUDIOSYNC_REGISTER, new byte[] { 0 });
 
-		byte[] enablePattern = new byte[]
+		var enablePattern = new byte[]
 		{
 			0b00000000, 0b10111111,
 			0b00111110, 0b00111110,
@@ -129,15 +130,15 @@ public class LEDShim
 			0b01111111, 0b00000000,
 		};
 
-		this.Bank(1);
-		this.Write(this.Addr, 0x00, enablePattern);
+		Bank(1);
+		Write(0x00, enablePattern);
 
-		this.Bank(0);
-		this.Write(this.Addr, 0x00, enablePattern);
+		Bank(0);
+		Write(0x00, enablePattern);
 
 		AppDomain.CurrentDomain.ProcessExit += (sender, e) =>
 		{
-			this.ClearOnExit();
+			ClearOnExit();
 		};
 
 		Console.CancelKeyPress += (sender, e) =>
@@ -148,38 +149,38 @@ public class LEDShim
 
 	public void Clear()
 	{
-		this.currentFrame = 0;
-		this.buf = new List<int[]>();
-		for (int i = 0; i < this.width; i++)
+		currentFrame = 0;
+		buf = new List<int[]>();
+		for (var i = 0; i < Width; i++)
 		{
-			this.buf.Add(new int[] { 0, 0, 0, 255 });
+			buf.Add(new [] { 0, 0, 0, 255 });
 		}
 	}
 
 	public void ClearOnExit()
 	{
-		if (this.clearOnExit)
+		if (clearOnExit)
 		{
-			this.Clear();
-			this.Show();
+			Clear();
+			Show();
 		}
 	}
 
 	public void SetClearOnExit(bool v)
 	{
-		this.clearOnExit = v;
+		clearOnExit = v;
 	}
 
 	public void SetBrightness(double br)
 	{
-		this.brightness = br;
+		brightness = br;
 	}
 
 	public void SetAll(int r, int g, int b, double br = 1.0)
 	{
-		for (int i = 0; i < this.width; i++)
+		for (var i = 0; i < Width; i++)
 		{
-			this.SetPixel(i, r, g, b, br);
+			SetPixel(i, r, g, b, br);
 		}
 	}
 
@@ -194,12 +195,12 @@ public class LEDShim
 			throw new Exception("Invalid RGB value. Must be 0 <= value <= 255");
 		}
 
-		if (x < 0 || x >= this.width)
+		if (x < 0 || x >= Width)
 		{
 			throw new Exception("Invalid pixel index");
 		}
 
-		this.buf[x] = new int[] { r, g, b, (int)(br * 255) };
+		buf[x] = new int[] { r, g, b, (int)(br * 255) };
 	}
 
 	private List<List<int>> Chunk(List<int> array, int count)
@@ -209,9 +210,9 @@ public class LEDShim
 			return new List<List<int>>();
 		}
 
-		List<List<int>> result = new List<List<int>>();
-		int i = 0;
-		int length = array.Count;
+		List<List<int>> result = new();
+		var i = 0;
+		var length = array.Count;
 		while (i < length)
 		{
 			result.Add(array.GetRange(i, Math.Min(count, length - i)));
@@ -223,25 +224,25 @@ public class LEDShim
 
 	public void Show()
 	{
-		this.Setup();
+		Setup();
 
-		int nextFrame = this.currentFrame == 1 ? 0 : 1;
+		int nextFrame = currentFrame == 1 ? 0 : 1;
 		int[] output = new int[144];
 
-		for (int x = 0; x < this.width; x++)
+		for (int x = 0; x < Width; x++)
 		{
-			int[] rgbbr = this.buf[x];
-			int r = rgbbr[0];
-			int g = rgbbr[1];
-			int b = rgbbr[2];
-			double br = rgbbr[3] / 255.0;
+			var rgbbr = buf[x];
+			var r = rgbbr[0];
+			var g = rgbbr[1];
+			var b = rgbbr[2];
+			var br = rgbbr[3] / 255.0;
 
-			r = LED_GAMMA[(int)(r * this.brightness * br)];
-			g = LED_GAMMA[(int)(g * this.brightness * br)];
-			b = LED_GAMMA[(int)(b * this.brightness * br)];
+			r = LED_GAMMA[(int)(r * brightness * br)];
+			g = LED_GAMMA[(int)(g * brightness * br)];
+			b = LED_GAMMA[(int)(b * brightness * br)];
 
-			int[][] lookup = LOOKUP;
-			for (int i = 0; i < 3; i++)
+			var lookup = LOOKUP;
+			for (var i = 0; i < 3; i++)
 			{
 				output[lookup[x][i]] = i switch
 				{
@@ -253,28 +254,28 @@ public class LEDShim
 			}
 		}
 
-		this.Bank(((byte)nextFrame));
-		int offset = 0;
-		List<List<int>> chunks = this.Chunk(new List<int>(output), 32);
+		Bank(((byte)nextFrame));
+		var offset = 0;
+		var chunks = Chunk(new List<int>(output), 32);
 
-		foreach (List<int> chk in chunks)
+		foreach (var chk in chunks)
 		{
-			this.Write(this.Addr, ((byte)(COLOR_OFFSET + offset)), chk.Select(c => ((byte)c)).ToArray());
+			Write(((byte)(COLOR_OFFSET + offset)), chk.Select(c => ((byte)c)).ToArray());
 			offset += 32;
 		}
 
-		this.Frame(nextFrame);
+		Frame(nextFrame);
 	}
 
 	public void Reset()
 	{
-		this.Sleep(true);
-		this.Sleep(false);
+		Sleep(true);
+		Sleep(false);
 	}
 
 	public bool Sleep(bool value)
 	{
-		return this.Register(CONFIG_BANK, SHUTDOWN_REGISTER, !value ? (byte)1 : (byte)0);
+		return Register(CONFIG_BANK, SHUTDOWN_REGISTER, !value ? (byte)1 : (byte)0);
 	}
 
 	private void Frame(int frame, bool show = true)
@@ -284,30 +285,29 @@ public class LEDShim
 			throw new Exception("Invalid frame value");
 		}
 
-		this.currentFrame = frame;
+		currentFrame = frame;
 
 		if (show)
 		{
-			this.Register(CONFIG_BANK, FRAME_REGISTER, (byte)frame);
+			Register(CONFIG_BANK, FRAME_REGISTER, (byte)frame);
 		}
 	}
 
 	private void Bank(byte bank)
 	{
-		this.Write(this.Addr, BANK_ADDRESS, new byte[] { bank });
+		Write(BANK_ADDRESS, new [] { bank });
 	}
 
-	private void Write(int addr, byte cmd, byte[] data)
+	private void Write(byte cmd, byte[] data)
 	{
-		Span<byte> buffer = data;
-		this.i2c.Write(new byte[] { cmd });
-		this.i2c.Write(buffer);
+		i2c.WriteByte(cmd);
+		i2c.Write(data);
 	}
 
 	private bool Register(byte bank, byte register, byte value)
 	{
-		this.Bank(bank);
-		this.Write(this.Addr, register, new byte[] { value });
+		Bank(bank);
+		Write(register, new [] { value });
 		return true;
 	}
 }
