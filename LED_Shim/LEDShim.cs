@@ -103,7 +103,7 @@ public class LEDShim
 		isSetup = true;
 		i2c = I2cDevice.Create(new I2cConnectionSettings(1, Addr));
 		Console.WriteLine($"Device Name: \"{i2c.QueryComponentInformation()?.Description}\"");
-		Console.WriteLine($"Device Name: \"{(string.Join(", ", i2c.QueryComponentInformation()?.Properties?.Select(p => $"{p.Key}: {p.Value}")))}\"");
+		Console.WriteLine($"Device Properties: \"{(string.Join(", ", i2c.QueryComponentInformation()?.Properties?.Select(p => $"{p.Key}: {p.Value}")))}\"");
 		Reset();
 		Show();
 		Bank(CONFIG_BANK);
