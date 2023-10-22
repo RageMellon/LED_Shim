@@ -65,9 +65,6 @@ public class LEDShim
 		new[] {13, 77, 93}
 	};
 
-	private static readonly int WIDTH = 28;
-	private static readonly int HEIGHT = 1;
-
 	private static readonly byte[] LED_GAMMA = {
 		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 		0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2,
@@ -94,11 +91,6 @@ public class LEDShim
 		isSetup = false;
 		clearOnExit = true;
 		brightness = 1.0;
-		buf = new List<int[]>();
-		for (var i = 0; i < width; i++)
-		{
-			buf.Add(new [] { 0, 0, 0, 255 });
-		}
 		Clear();
 	}
 
@@ -110,7 +102,8 @@ public class LEDShim
 		}
 		isSetup = true;
 		i2c = I2cDevice.Create(new I2cConnectionSettings(1, Addr));
-		Console.WriteLine($"Device Name: \"{i2c.QueryComponentInformation()?.Name}\"");
+		Console.WriteLine($"Device Name: \"{i2c.QueryComponentInformation()?.Description}\"");
+		Console.WriteLine($"Device Name: \"{(string.Join(", ", i2c.QueryComponentInformation()?.Properties?.Select(p => $"{p.Key}: {p.Value}")))}\"");
 		Reset();
 		Show();
 		Bank(CONFIG_BANK);
